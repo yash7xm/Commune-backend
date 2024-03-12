@@ -1,7 +1,8 @@
 const { MessageService } = require("../services");
 const { SuccessResponse, ErrorResponse } = require("../utils/common");
 const { StatusCodes } = require("http-status-codes");
-const { sendMessageToSocket } = require("../edge-server");
+// const { sendMessageToSocket } = require("../edge-server");
+const { produceMessage } = require("../kafka/producer");
 
 async function sendMessage(req, res) {
   try {
@@ -11,7 +12,8 @@ async function sendMessage(req, res) {
       message: req.body.message,
       time: req.body.time,
     });
-    sendMessageToSocket(message);
+    // sendMessageToSocket(message);
+    produceMessage(message);
     SuccessResponse.data = message;
     return res.status(StatusCodes.CREATED).json(SuccessResponse);
   } catch (error) {

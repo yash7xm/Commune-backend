@@ -15,4 +15,6 @@ async function consumeMessages() {
   });
 }
 
+consumeMessages();
+
 module.exports = consumeMessages;
