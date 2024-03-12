@@ -1,7 +1,7 @@
 const { MessageService } = require("../services");
 const { SuccessResponse, ErrorResponse } = require("../utils/common");
 const { StatusCodes } = require("http-status-codes");
-const { sendMessageToSocket } = require("../edge-server/helper");
+const { sendMessageToSocket } = require("../edge-server");
 
 async function sendMessage(req, res) {
   try {

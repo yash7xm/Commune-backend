@@ -1,33 +1,38 @@
-const cluster = require("cluster");
-const http = require("http");
-const { setupMaster, setupWorker } = require("@socket.io/sticky");
-const io = require("./edge-server");
+const { Server } = require("socket.io");
+const { setupWorker } = require("@socket.io/sticky");
+const { ServerConfig } = require("./config");
 
-const WORKERS_COUNT = 4;
-
-if (cluster.isMaster) {
-  console.log(`Master ${process.pid} is running`);
-
-  for (let i = 0; i < WORKERS_COUNT; i++) {
-    cluster.fork();
-  }
-
-  cluster.on("exit", (worker) => {
-    console.log(`Worker ${worker.process.pid} died`);
-    cluster.fork();
+function socketServer(server) {
+  const io = new Server(server, {
+    cors: {
+      origin: "http://localhost:3000",
+    },
   });
 
-  const httpServer = http.createServer();
-  setupMaster(httpServer, {
-    loadBalancingMethod: "least-connection", // either "random", "round-robin" or "least-connection"
-  });
-  const PORT = process.env.PORT || 3000;
+  io.on("connection", (socket) => {
+    console.log("User connected:", socket.id);
 
-  httpServer.listen(PORT, () =>
-    console.log(`server listening at http://localhost:${PORT}`)
-  );
-} else {
-  console.log(`Worker ${process.pid} started`);
+    // join room
+    socket.on("joinRoom", (roomId) => {
+      socket.join(`room-${roomId}`);
+      console.log(`Joined room room-${roomId}`);
+    });
+
+    // notify users upon disconnection
+    socket.on("disconnect", () => {
+      socket.broadcast.emit("user disconnected", socket.id);
+    });
+  });
+
   setupWorker(io);
 }
 
+function sendMessageToSocket(io, message) {
+  if (io) {
+    io.to(`room-${message.channelId}`).emit("msg_rcvd", message);
+  } else {
+    console.error("Socket.IO server is not initialized");
+  }
+}
+
+module.exports = { socketServer, sendMessageToSocket };
