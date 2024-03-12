@@ -15,7 +15,7 @@ const io = new Server(server, {
 });
 
 io.on("connection", (socket) => {
-  console.log("User connected on edge-server 1:", socket.id);
+  console.log("User connected on edge-server 2:", socket.id);
 
   // join room
   socket.on("joinRoom", (roomId) => {
@@ -37,6 +37,6 @@ consumeMessages(io)
     console.error("Error starting Kafka consumer:", error);
   });
 
-server.listen(process.env.WS_SERVER_PORT, () => {
-  console.log(`Edge Server listening on port ${process.env.WS_SERVER_PORT}`);
+server.listen(4001, () => {
+  console.log(`Edge Server listening on port ${4001}`);
 });
