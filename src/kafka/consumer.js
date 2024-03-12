@@ -15,6 +15,4 @@ async function consumeMessages() {
   });
 }
 
-consumeMessages();
-
-module.exports = consumeMessages;
+module.exports = { consumeMessages };

@@ -18,5 +18,3 @@ app.get("/dog", (req, res) => {
 app.listen(ServerConfig.API_SERVER_PORT, () => {
   console.log(`Api server listening at ${ServerConfig.API_SERVER_PORT}`);
 });
-
-// module.export = app;
