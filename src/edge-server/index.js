@@ -1,8 +1,8 @@
-const { Server } = require("socket.io");
 const express = require("express");
 const app = express();
 const http = require("http");
 const server = http.createServer(app);
+const { Server } = require("socket.io");
 const { ServerConfig } = require("../config");
 
 const { consumeMessages } = require("../kafka/consumer.js");
@@ -28,15 +28,14 @@ io.on("connection", (socket) => {
   });
 });
 
-consumeMessages()
-  .then((message) => {
-    console.log(message);
-    io.to(`room-${message.channelId}`).emit("msg_rcvd", message);
+consumeMessages(io)
+  .then(() => {
+    console.log("Kafka consumer started successfully");
   })
   .catch((error) => {
-    console.log(error);
+    console.error("Error starting Kafka consumer:", error);
   });
 
-server.listen(ServerConfig.WS_SERVER_PORT, () => {
-  console.log(`Edge Server listening on port ${ServerConfig.WS_SERVER_PORT}`);
+server.listen(process.env.WS_SERVER_PORT, () => {
+  console.log(`Edge Server listening on port ${process.env.WS_SERVER_PORT}`);
 });
